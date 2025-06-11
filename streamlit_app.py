@@ -8,6 +8,7 @@ import pandas as pd
 import io
 import time
 import logging
+import re
 from typing import List
 from datetime import datetime
 
@@ -134,6 +135,44 @@ def process_apns(apns: List[str], delay: float):
         st.error(f"❌ Processing failed: {str(e)}")
     finally:
         scraper.close()
+
+def extract_apns_from_content(content: str, filename: str) -> List[str]:
+    """
+    Extract APNs from file content by pattern matching the APN format.
+    APNs follow the pattern: XXX-XX-XXX-XXX (3-2-3-3 digits separated by dashes)
+    
+    Args:
+        content: File content as string
+        filename: Name of the uploaded file
+        
+    Returns:
+        List of extracted APN strings
+    """
+    apns = []
+    
+    # Define APN pattern: XXX-XX-XXX-XXX (Clark County format)
+    apn_pattern = r'\b\d{3}-\d{2}-\d{3}-\d{3}\b'
+    
+    if filename.endswith('.csv'):
+        # Process CSV line by line to find APNs in any column
+        lines = content.split('\n')
+        for line_num, line in enumerate(lines, 1):
+            if line.strip():
+                # Find all APN matches in this line (any column)
+                apn_matches = re.findall(apn_pattern, line)
+                for apn in apn_matches:
+                    if apn not in apns:  # Avoid duplicates
+                        apns.append(apn)
+                        logger.debug(f"Found APN '{apn}' on line {line_num}")
+    else:
+        # For TXT files, extract APNs from entire content
+        apn_matches = re.findall(apn_pattern, content)
+        for apn in apn_matches:
+            if apn not in apns:  # Avoid duplicates
+                apns.append(apn)
+    
+    logger.info(f"Extracted {len(apns)} unique APNs using pattern matching")
+    return apns
 
 # Page configuration
 st.set_page_config(
@@ -290,39 +329,32 @@ if not st.session_state.processing_complete:
     
     if uploaded_file:
         try:
-            # Process uploaded file
+            # Process uploaded file using pattern matching
             content = uploaded_file.read().decode('utf-8')
-            apns = []
             
-            if uploaded_file.name.endswith('.csv'):
-                # Handle CSV files
-                lines = content.split('\n')
-                # Try to find APN column or use first column
-                for line in lines[1:]:  # Skip header
-                    if line.strip():
-                        apn = line.split(',')[0].strip().strip('"')
-                        if apn and apn.upper() != 'APN':
-                            apns.append(apn)
-            else:
-                # Handle TXT files
-                apns = [line.strip() for line in content.split('\n') if line.strip()]
+            # Use pattern matching to find APNs in any column
+            apns = extract_apns_from_content(content, uploaded_file.name)
             
             st.session_state.uploaded_file = uploaded_file
             st.session_state.apns = apns
             
-            # Show file preview
+            # Show file preview with enhanced detection info
             col1, col2, col3 = st.columns([1, 2, 1])
             with col2:
-                st.success(f"✅ Successfully loaded **{len(apns)}** APNs from `{uploaded_file.name}`")
-                
                 if len(apns) > 0:
-                    with st.expander("📋 Preview APNs"):
+                    st.success(f"✅ Successfully detected **{len(apns)}** APNs from `{uploaded_file.name}`")
+                    st.info("🔍 **Auto-detected APNs** using pattern matching (XXX-XX-XXX-XXX format)")
+                    
+                    with st.expander("📋 Preview Detected APNs"):
                         preview_count = min(10, len(apns))
                         for i in range(preview_count):
                             st.write(f"• {apns[i]}")
                         if len(apns) > 10:
                             st.write(f"... and {len(apns) - 10} more APNs")
-            
+                else:
+                    st.error("❌ No APNs detected in the uploaded file")
+                    st.info("📝 **Expected format**: APNs should follow the pattern XXX-XX-XXX-XXX (e.g., 177-13-420-002)")
+                    
         except Exception as e:
             st.error(f"❌ Error reading file: {str(e)}")
             
