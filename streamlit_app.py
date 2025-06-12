@@ -41,7 +41,7 @@ ADMIN_PASSWORD: str = (
     os.getenv("LOGIN_PASSWORD") or
     os.getenv("RAILWAY_PRIVATE_PASSWORD") or  # Railway service variable
     os.getenv("PRIVATE_PASSWORD") or  # Alternative Railway variable
-    "CHANGE_ME_IN_PRODUCTION"
+    "LOCAL_DEV_PASSWORD_2025"  # Local development password for testing
 )
 SESSION_TIMEOUT_MINUTES: int = int(os.getenv("SESSION_TIMEOUT", "480"))  # 8 hours default
 
@@ -51,7 +51,7 @@ logger.info(f"Environment variable check: SCRAPER_PASSWORD={'SET' if os.getenv('
 logger.info(f"Environment variable check: AUTH_PASSWORD={'SET' if os.getenv('AUTH_PASSWORD') else 'NOT_SET'}")
 logger.info(f"Environment variable check: RAILWAY_PRIVATE_PASSWORD={'SET' if os.getenv('RAILWAY_PRIVATE_PASSWORD') else 'NOT_SET'}")
 logger.info(f"Environment variable check: PRIVATE_PASSWORD={'SET' if os.getenv('PRIVATE_PASSWORD') else 'NOT_SET'}")
-logger.info(f"Final ADMIN_PASSWORD: {'CONFIGURED' if ADMIN_PASSWORD != 'CHANGE_ME_IN_PRODUCTION' else 'DEFAULT'}")
+logger.info(f"Final ADMIN_PASSWORD: {'CONFIGURED' if ADMIN_PASSWORD != 'CHANGE_ME_IN_PRODUCTION' else 'LOCAL_DEV'}")
 
 def authenticate_user() -> bool:
     """
@@ -319,42 +319,8 @@ def authenticate_user() -> bool:
         </div>
         """, unsafe_allow_html=True)
         
-        # User-friendly animated features display
+        # Animated data flow
         st.markdown("""
-        <div class="features-showcase">
-            <div class="feature-item">
-                <div class="feature-icon">⚡</div>
-                <div class="feature-content">
-                    <h4>Lightning Fast Processing</h4>
-                    <p>Get your property data in seconds, not hours</p>
-                </div>
-            </div>
-            
-            <div class="feature-item">
-                <div class="feature-icon">🎯</div>
-                <div class="feature-content">
-                    <h4>Smart Auto-Detection</h4>
-                    <p>Just upload your file - we'll find all the APNs automatically</p>
-                </div>
-            </div>
-            
-            <div class="feature-item">
-                <div class="feature-icon">📊</div>
-                <div class="feature-content">
-                    <h4>Real-Time Progress</h4>
-                    <p>Watch your data come to life with live updates</p>
-                </div>
-            </div>
-            
-            <div class="feature-item">
-                <div class="feature-icon">🔒</div>
-                <div class="feature-content">
-                    <h4>Secure & Reliable</h4>
-                    <p>Your data is protected with enterprise-grade security</p>
-                </div>
-            </div>
-        </div>
-        
         <div class="data-flow-animation">
             <div class="flow-step">
                 <div class="flow-icon">📁</div>
@@ -373,12 +339,9 @@ def authenticate_user() -> bool:
         </div>
         """, unsafe_allow_html=True)
         
-        # High-performance authentication form
-        col1, col2, col3 = st.columns([1, 2, 1])
+        # High-performance authentication form - centered and larger
+        col1, col2, col3 = st.columns([1, 3, 1])  
         with col2:
-            # Clean authentication form without problematic HTML containers
-            st.markdown("---")
-            
             password_input: str = st.text_input(
                 "🔑 Enter Access Password:",
                 type="password",
@@ -404,8 +367,6 @@ def authenticate_user() -> bool:
                     
                     # Log failed authentication attempt (no sensitive data)
                     logger.warning(f"Failed authentication attempt from session {id(st.session_state)}")
-            
-            st.markdown("---")
         
         # Footer information
         st.markdown("---")
