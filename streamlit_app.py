@@ -157,6 +157,16 @@ def authenticate_user() -> bool:
                 border-radius: 10px;
                 margin: 1rem 0;
                 box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+                color: #333333 !important;
+                min-height: 200px;
+            }
+            .auth-form input {
+                color: #333333 !important;
+                background: white !important;
+            }
+            .auth-form label {
+                color: #333333 !important;
+                font-weight: 600;
             }
             .performance-notice {
                 background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
@@ -164,6 +174,7 @@ def authenticate_user() -> bool:
                 border-radius: 8px;
                 border-left: 4px solid #28a745;
                 margin: 1rem 0;
+                color: #333333 !important;
             }
         </style>
         """, unsafe_allow_html=True)
@@ -424,9 +435,10 @@ def extract_apns_from_content(content: str, filename: str) -> List[str]:
     logger.info(f"Extracted {len(apns)} unique APNs using pattern matching")
     return apns
 
-# Custom CSS for modern styling
+# Custom CSS for modern styling with proper contrast and visibility
 st.markdown("""
 <style>
+    /* Main header styling */
     .main-header {
         text-align: center;
         font-size: 3rem;
@@ -444,6 +456,47 @@ st.markdown("""
         margin-bottom: 2rem;
     }
     
+    /* Authentication page styling with proper contrast */
+    .auth-container {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 2rem;
+        border-radius: 15px;
+        color: white;
+        text-align: center;
+        margin: 2rem 0;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    }
+    
+    .auth-form {
+        background: white;
+        padding: 2rem;
+        border-radius: 10px;
+        margin: 1rem 0;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+        color: #333333 !important;
+        min-height: 200px;
+    }
+    
+    .auth-form input {
+        color: #333333 !important;
+        background: white !important;
+    }
+    
+    .auth-form label {
+        color: #333333 !important;
+        font-weight: 600;
+    }
+    
+    .performance-notice {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        padding: 1.5rem;
+        border-radius: 8px;
+        border-left: 4px solid #28a745;
+        margin: 1rem 0;
+        color: #333333 !important;
+    }
+    
+    /* Main application styling */
     .upload-section {
         background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
         padding: 2rem;
@@ -451,6 +504,7 @@ st.markdown("""
         border: 2px dashed #6c757d;
         text-align: center;
         margin: 2rem 0;
+        min-height: 150px;
     }
     
     .processing-card {
@@ -460,6 +514,7 @@ st.markdown("""
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         border-left: 5px solid #667eea;
         margin: 1rem 0;
+        min-height: 100px;
     }
     
     .success-card {
@@ -468,6 +523,8 @@ st.markdown("""
         border-radius: 15px;
         border-left: 5px solid #28a745;
         margin: 1rem 0;
+        min-height: 100px;
+        color: #155724 !important;
     }
     
     .metric-card {
@@ -477,6 +534,7 @@ st.markdown("""
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         text-align: center;
         margin: 0.5rem;
+        border: 1px solid #e9ecef;
     }
     
     .download-section {
@@ -485,8 +543,17 @@ st.markdown("""
         border-radius: 15px;
         text-align: center;
         margin: 2rem 0;
+        min-height: 120px;
+        color: #856404 !important;
+        border: 1px solid #ffeaa7;
     }
     
+    .download-section h3 {
+        color: #856404 !important;
+        margin-bottom: 1rem;
+    }
+    
+    /* Step indicator styling */
     .step-indicator {
         display: flex;
         justify-content: center;
@@ -505,16 +572,56 @@ st.markdown("""
         justify-content: center;
         font-weight: bold;
         margin: 0 1rem;
+        border: 2px solid #e9ecef;
     }
     
     .step.active {
         background: #667eea;
         color: white;
+        border-color: #667eea;
     }
     
     .step.completed {
         background: #28a745;
         color: white;
+        border-color: #28a745;
+    }
+    
+    /* Fix for invisible text in various sections */
+    .stMarkdown p, .stMarkdown h1, .stMarkdown h2, .stMarkdown h3, .stMarkdown h4 {
+        color: #333333 !important;
+    }
+    
+    /* Ensure content is visible in all containers */
+    .element-container {
+        background: transparent !important;
+    }
+    
+    /* High-performance processing indicators */
+    .performance-status {
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-weight: 600;
+        display: inline-block;
+        margin: 0.25rem;
+    }
+    
+    .status-excellent {
+        background: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+    }
+    
+    .status-good {
+        background: #cce7ff;
+        color: #004085;
+        border: 1px solid #b3d7ff;
+    }
+    
+    .status-slow {
+        background: #fff3cd;
+        color: #856404;
+        border: 1px solid #ffeaa7;
     }
 </style>
 """, unsafe_allow_html=True)
