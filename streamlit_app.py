@@ -1,6 +1,7 @@
 """
 Clark County APN Property Scraper - Streamlit Web Interface
 High-performance web scraping for Nevada property data with modern UI
+Secured for internal company use with environment variable authentication
 """
 
 import streamlit as st
@@ -9,7 +10,8 @@ import io
 import time
 import logging
 import re
-from typing import List
+import os
+from typing import List, Optional
 from datetime import datetime
 
 # Import existing scraper components
@@ -18,9 +20,182 @@ from src.scraper.data_parser import PropertyDataParser
 from src.models.property import Property
 from src.utils.csv_handler import CSVHandler
 
-# Configure logging
-logging.basicConfig(level=logging.INFO)
+# Configure logging for performance monitoring and security
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
+
+# Security configuration using environment variables (secure for production)
+ADMIN_PASSWORD: str = os.getenv("SCRAPER_PASSWORD", "CHANGE_ME_IN_PRODUCTION")
+SESSION_TIMEOUT_MINUTES: int = int(os.getenv("SESSION_TIMEOUT", "480"))  # 8 hours default
+
+def authenticate_user() -> bool:
+    """
+    High-performance authentication system using secure environment variables.
+    Password stored securely in Railway environment, not in public code.
+    Target: Zero performance impact on 0.5-1 second per APN scraping.
+    
+    Returns:
+        bool: True if user is authenticated and session valid, False otherwise
+    """
+    # Security check: Warn if using default password (development mode)
+    if ADMIN_PASSWORD == "CHANGE_ME_IN_PRODUCTION":
+        st.error("⚠️ SECURITY WARNING: Default password detected. Configure SCRAPER_PASSWORD environment variable.")
+        logger.critical("Application started with default password - security risk detected")
+        st.stop()
+    
+    # Initialize session state for authentication with proper typing
+    if "authenticated" not in st.session_state:
+        st.session_state.authenticated = False
+        st.session_state.auth_timestamp = None
+    
+    # Performance-optimized session timeout check
+    if st.session_state.authenticated and st.session_state.auth_timestamp:
+        session_age: float = time.time() - st.session_state.auth_timestamp
+        if session_age > (SESSION_TIMEOUT_MINUTES * 60):
+            st.session_state.authenticated = False
+            st.session_state.auth_timestamp = None
+            logger.info(f"Session expired after {session_age/60:.1f} minutes")
+    
+    # Show authentication form if not authenticated
+    if not st.session_state.authenticated:
+        st.set_page_config(
+            page_title="Clark County Scraper - Access Control",
+            page_icon="🔒",
+            layout="centered"
+        )
+        
+        # High-performance CSS injection
+        st.markdown("""
+        <style>
+            .auth-container {
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                padding: 2rem;
+                border-radius: 15px;
+                color: white;
+                text-align: center;
+                margin: 2rem 0;
+                box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            }
+            .auth-form {
+                background: white;
+                padding: 2rem;
+                border-radius: 10px;
+                margin: 1rem 0;
+                box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+            }
+            .performance-notice {
+                background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+                padding: 1.5rem;
+                border-radius: 8px;
+                border-left: 4px solid #28a745;
+                margin: 1rem 0;
+            }
+        </style>
+        """, unsafe_allow_html=True)
+        
+        # Authentication header with performance specifications
+        st.markdown("""
+        <div class="auth-container">
+            <h1>🏠 Clark County APN Property Scraper</h1>
+            <h3>High-Performance Internal Company Tool</h3>
+            <p>Authorized Personnel Only</p>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        # Performance specifications display
+        st.markdown("""
+        <div class="performance-notice">
+            <strong>🚀 Performance Specifications:</strong><br>
+            • <strong>Target Speed:</strong> 0.5-1 second per APN<br>
+            • <strong>Connection Pooling:</strong> requests.Session() optimization<br>
+            • <strong>Parser:</strong> lxml for maximum speed<br>
+            • <strong>Error Handling:</strong> Comprehensive retry logic<br>
+            • <strong>Type Safety:</strong> Full type hints implementation<br>
+            • <strong>Security:</strong> Environment variable authentication
+        </div>
+        """, unsafe_allow_html=True)
+        
+        # High-performance authentication form
+        col1, col2, col3 = st.columns([1, 2, 1])
+        with col2:
+            st.markdown('<div class="auth-form">', unsafe_allow_html=True)
+            
+            password_input: str = st.text_input(
+                "🔑 Enter Access Password:",
+                type="password",
+                help="Contact IT department for access credentials",
+                placeholder="Enter secure company password"
+            )
+            
+            if st.button("🚪 Login", use_container_width=True, type="primary"):
+                # Performance-optimized password verification
+                if password_input == ADMIN_PASSWORD:
+                    st.session_state.authenticated = True
+                    st.session_state.auth_timestamp = time.time()
+                    
+                    # Log successful authentication (no sensitive data)
+                    logger.info(f"Successful authentication from session {id(st.session_state)}")
+                    
+                    st.success("✅ Access granted! Loading high-performance scraper interface...")
+                    time.sleep(1.5)
+                    st.rerun()
+                else:
+                    st.error("❌ Invalid password. Contact IT department for access.")
+                    
+                    # Log failed authentication attempt (no sensitive data)
+                    logger.warning(f"Failed authentication attempt from session {id(st.session_state)}")
+            
+            st.markdown('</div>', unsafe_allow_html=True)
+        
+        # Footer information
+        st.markdown("---")
+        st.markdown("""
+        <div style='text-align: center; color: #6c757d;'>
+            <small>
+                <strong>Clark County Nevada Property Data Extraction</strong><br>
+                Optimized for high-volume APN processing with enterprise-grade performance
+            </small>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        return False
+    
+    return True
+
+def add_session_controls() -> None:
+    """
+    Add high-performance session management controls to sidebar.
+    Zero impact on scraping performance - UI updates only.
+    """
+    with st.sidebar:
+        st.markdown("### 🔓 Session Control")
+        
+        # Show session info with performance metrics
+        if st.session_state.auth_timestamp:
+            session_duration: float = time.time() - st.session_state.auth_timestamp
+            hours: int = int(session_duration // 3600)
+            minutes: int = int((session_duration % 3600) // 60)
+            
+            if hours > 0:
+                st.write(f"⏱️ Session: {hours}h {minutes}m")
+            else:
+                st.write(f"⏱️ Session: {minutes}m")
+        
+        # High-performance logout button
+        if st.button("🚪 Logout", help="End current session securely"):
+            st.session_state.authenticated = False
+            st.session_state.auth_timestamp = None
+            
+            # Log logout event (no sensitive data)
+            logger.info(f"User logout from session {id(st.session_state)}")
+            st.rerun()
+
+# Authentication gate - must pass before accessing high-performance scraper
+if not authenticate_user():
+    st.stop()
+
+# Add session controls for authenticated users
+add_session_controls()
 
 # Processing function - defined early so it can be called later
 def process_apns(apns: List[str], delay: float):
