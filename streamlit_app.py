@@ -204,45 +204,36 @@ def authenticate_user() -> bool:
         # High-performance authentication form
         col1, col2, col3 = st.columns([1, 2, 1])
         with col2:
-            # Create styled container for form
-            with st.container():
-                st.markdown("""
-                <div style="
-                    background: white;
-                    padding: 2rem;
-                    border-radius: 10px;
-                    margin: 1rem 0;
-                    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
-                ">
-                """, unsafe_allow_html=True)
-                
-                password_input: str = st.text_input(
-                    "🔑 Enter Access Password:",
-                    type="password",
-                    help="Contact IT department for access credentials",
-                    placeholder="Enter secure company password",
-                    key="auth_password"
-                )
-                
-                if st.button("🚪 Login", use_container_width=True, type="primary", key="auth_login"):
-                    # Performance-optimized password verification
-                    if password_input == ADMIN_PASSWORD:
-                        st.session_state.authenticated = True
-                        st.session_state.auth_timestamp = time.time()
-                        
-                        # Log successful authentication (no sensitive data)
-                        logger.info(f"Successful authentication from session {id(st.session_state)}")
-                        
-                        st.success("✅ Access granted! Loading high-performance scraper interface...")
-                        time.sleep(1.5)
-                        st.rerun()
-                    else:
-                        st.error("❌ Invalid password. Contact IT department for access.")
-                        
-                        # Log failed authentication attempt (no sensitive data)
-                        logger.warning(f"Failed authentication attempt from session {id(st.session_state)}")
-                
-                st.markdown("</div>", unsafe_allow_html=True)
+            # Clean authentication form without problematic HTML containers
+            st.markdown("---")
+            
+            password_input: str = st.text_input(
+                "🔑 Enter Access Password:",
+                type="password",
+                help="Contact IT department for access credentials",
+                placeholder="Enter secure company password",
+                key="auth_password"
+            )
+            
+            if st.button("🚪 Login", use_container_width=True, type="primary", key="auth_login"):
+                # Performance-optimized password verification
+                if password_input == ADMIN_PASSWORD:
+                    st.session_state.authenticated = True
+                    st.session_state.auth_timestamp = time.time()
+                    
+                    # Log successful authentication (no sensitive data)
+                    logger.info(f"Successful authentication from session {id(st.session_state)}")
+                    
+                    st.success("✅ Access granted! Loading high-performance scraper interface...")
+                    time.sleep(1.5)
+                    st.rerun()
+                else:
+                    st.error("❌ Invalid password. Contact IT department for access.")
+                    
+                    # Log failed authentication attempt (no sensitive data)
+                    logger.warning(f"Failed authentication attempt from session {id(st.session_state)}")
+            
+            st.markdown("---")
         
         # Footer information
         st.markdown("---")
@@ -452,7 +443,7 @@ st.markdown("""
     /* Main header styling */
     .main-header {
         text-align: center;
-        font-size: 3rem;
+        font-size: 2.5rem;
         font-weight: 700;
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         -webkit-background-clip: text;
@@ -462,9 +453,16 @@ st.markdown("""
     
     .subtitle {
         text-align: center;
-        font-size: 1.2rem;
+        font-size: 1.1rem;
         color: #6c757d;
-        margin-bottom: 2rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    /* Compact main container */
+    .main-container {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 1rem;
     }
     
     /* Authentication page styling with proper contrast */
@@ -478,26 +476,6 @@ st.markdown("""
         box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
     }
     
-    .auth-form {
-        background: white;
-        padding: 2rem;
-        border-radius: 10px;
-        margin: 1rem 0;
-        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
-        color: #333333 !important;
-        min-height: 200px;
-    }
-    
-    .auth-form input {
-        color: #333333 !important;
-        background: white !important;
-    }
-    
-    .auth-form label {
-        color: #333333 !important;
-        font-weight: 600;
-    }
-    
     .performance-notice {
         background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
         padding: 1.5rem;
@@ -507,89 +485,128 @@ st.markdown("""
         color: #333333 !important;
     }
     
-    /* Main application styling */
+    /* Modern upload section with taller box */
     .upload-section {
         background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-        padding: 2rem;
-        border-radius: 15px;
-        border: 2px dashed #6c757d;
+        padding: 3rem 2rem;
+        border-radius: 20px;
+        border: 3px dashed #667eea;
         text-align: center;
         margin: 2rem 0;
-        min-height: 150px;
+        min-height: 250px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        transition: all 0.3s ease;
     }
     
-    .processing-card {
-        background: white;
-        padding: 2rem;
-        border-radius: 15px;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        border-left: 5px solid #667eea;
-        margin: 1rem 0;
-        min-height: 100px;
+    .upload-section:hover {
+        border-color: #764ba2;
+        background: linear-gradient(135deg, #f1f3f4 0%, #e8ecef 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.15);
     }
     
-    .success-card {
-        background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
-        padding: 2rem;
-        border-radius: 15px;
-        border-left: 5px solid #28a745;
-        margin: 1rem 0;
-        min-height: 100px;
-        color: #155724 !important;
-    }
-    
-    .metric-card {
-        background: white;
-        padding: 1.5rem;
-        border-radius: 10px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        text-align: center;
-        margin: 0.5rem;
-        border: 1px solid #e9ecef;
-    }
-    
-    .download-section {
-        background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
-        padding: 2rem;
-        border-radius: 15px;
-        text-align: center;
-        margin: 2rem 0;
-        min-height: 120px;
-        color: #856404 !important;
-        border: 1px solid #ffeaa7;
-    }
-    
-    .download-section h3 {
-        color: #856404 !important;
+    .upload-icon {
+        font-size: 3rem;
+        color: #667eea;
         margin-bottom: 1rem;
     }
     
-    /* Step indicator styling */
+    .upload-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 0.5rem;
+    }
+    
+    .upload-subtitle {
+        font-size: 1rem;
+        color: #6c757d;
+        margin-bottom: 1.5rem;
+    }
+    
+    /* Modern processing card */
+    .processing-card {
+        background: white;
+        padding: 2rem;
+        border-radius: 20px;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        border-left: 5px solid #667eea;
+        margin: 2rem 0;
+        min-height: 180px;
+    }
+    
+    /* Modern success card */
+    .success-card {
+        background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+        padding: 2rem;
+        border-radius: 20px;
+        border-left: 5px solid #28a745;
+        margin: 2rem 0;
+        min-height: 120px;
+        color: #155724 !important;
+        box-shadow: 0 8px 25px rgba(40, 167, 69, 0.15);
+    }
+    
+    /* Modern metric cards */
+    .metric-card {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 15px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        text-align: center;
+        margin: 0.5rem;
+        border: 1px solid #f0f0f0;
+        transition: transform 0.2s ease;
+    }
+    
+    .metric-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+    }
+    
+    /* Modern download section */
+    .download-section {
+        background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+        padding: 2rem;
+        border-radius: 20px;
+        text-align: center;
+        margin: 2rem 0;
+        min-height: 150px;
+        color: #856404 !important;
+        border: 1px solid #ffeaa7;
+        box-shadow: 0 8px 25px rgba(255, 234, 167, 0.3);
+    }
+    
+    /* Compact step indicator */
     .step-indicator {
         display: flex;
         justify-content: center;
         align-items: center;
-        margin: 2rem 0;
+        margin: 1.5rem 0;
     }
     
     .step {
         background: #e9ecef;
         color: #6c757d;
         border-radius: 50%;
-        width: 40px;
-        height: 40px;
+        width: 35px;
+        height: 35px;
         display: flex;
         align-items: center;
         justify-content: center;
         font-weight: bold;
-        margin: 0 1rem;
+        margin: 0 0.8rem;
         border: 2px solid #e9ecef;
+        transition: all 0.3s ease;
     }
     
     .step.active {
         background: #667eea;
         color: white;
         border-color: #667eea;
+        transform: scale(1.1);
     }
     
     .step.completed {
@@ -598,41 +615,67 @@ st.markdown("""
         border-color: #28a745;
     }
     
-    /* Fix for invisible text in various sections */
-    .stMarkdown p, .stMarkdown h1, .stMarkdown h2, .stMarkdown h3, .stMarkdown h4 {
-        color: #333333 !important;
+    .step-line {
+        width: 40px;
+        height: 2px;
+        background: #e9ecef;
+        transition: all 0.3s ease;
     }
     
-    /* Ensure content is visible in all containers */
-    .element-container {
-        background: transparent !important;
+    .step-line.active {
+        background: #28a745;
     }
     
-    /* High-performance processing indicators */
-    .performance-status {
-        padding: 0.5rem 1rem;
-        border-radius: 20px;
-        font-weight: 600;
+    /* Modern footer */
+    .modern-footer {
+        text-align: center;
+        color: #6c757d;
+        padding: 2rem 1rem 1rem;
+        font-size: 0.9rem;
+        border-top: 1px solid #e9ecef;
+        margin-top: 3rem;
+    }
+    
+    .performance-badge {
         display: inline-block;
-        margin: 0.25rem;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 0.3rem 0.8rem;
+        border-radius: 15px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        margin: 0 0.2rem;
     }
     
-    .status-excellent {
-        background: #d4edda;
-        color: #155724;
-        border: 1px solid #c3e6cb;
+    /* Hide default Streamlit elements for cleaner look */
+    .stApp > header {
+        background-color: transparent;
     }
     
-    .status-good {
-        background: #cce7ff;
-        color: #004085;
-        border: 1px solid #b3d7ff;
+    .stApp {
+        margin-top: -80px;
     }
     
-    .status-slow {
-        background: #fff3cd;
-        color: #856404;
-        border: 1px solid #ffeaa7;
+    /* Responsive design */
+    @media (max-width: 768px) {
+        .main-header {
+            font-size: 2rem;
+        }
+        
+        .upload-section {
+            padding: 2rem 1rem;
+            min-height: 200px;
+        }
+        
+        .step {
+            width: 30px;
+            height: 30px;
+            margin: 0 0.5rem;
+        }
+        
+        .step-line {
+            width: 30px;
+        }
     }
 </style>
 """, unsafe_allow_html=True)
@@ -645,11 +688,14 @@ if 'scraped_data' not in st.session_state:
 if 'processing_stats' not in st.session_state:
     st.session_state.processing_stats = None
 
-# Header section
+# Main container for compact layout
+st.markdown('<div class="main-container">', unsafe_allow_html=True)
+
+# Modern header section
 st.markdown('<h1 class="main-header">🏠 Clark County APN Property Scraper</h1>', unsafe_allow_html=True)
 st.markdown('<p class="subtitle">High-performance web scraping for Nevada property data</p>', unsafe_allow_html=True)
 
-# Step indicator
+# Compact step indicator
 current_step = 1
 if st.session_state.processing_complete:
     current_step = 3
@@ -659,31 +705,35 @@ elif 'uploaded_file' in st.session_state and st.session_state.uploaded_file is n
 st.markdown(f"""
 <div class="step-indicator">
     <div class="step {'completed' if current_step > 1 else 'active' if current_step == 1 else ''}">1</div>
-    <div style="width: 50px; height: 2px; background: {'#28a745' if current_step > 1 else '#e9ecef'};"></div>
+    <div class="step-line {'active' if current_step > 1 else ''}"></div>
     <div class="step {'completed' if current_step > 2 else 'active' if current_step == 2 else ''}">2</div>
-    <div style="width: 50px; height: 2px; background: {'#28a745' if current_step > 2 else '#e9ecef'};"></div>
+    <div class="step-line {'active' if current_step > 2 else ''}"></div>
     <div class="step {'active' if current_step == 3 else ''}">3</div>
 </div>
 """, unsafe_allow_html=True)
 
 st.markdown("""
-<div style="text-align: center; margin-bottom: 2rem;">
-    <strong>Step 1:</strong> Upload File &nbsp;&nbsp;&nbsp;
-    <strong>Step 2:</strong> Process Data &nbsp;&nbsp;&nbsp;
-    <strong>Step 3:</strong> Download Results
+<div style="text-align: center; margin-bottom: 2rem; color: #555;">
+    <span class="performance-badge">Upload File</span>
+    <span class="performance-badge">Process Data</span>
+    <span class="performance-badge">Download Results</span>
 </div>
 """, unsafe_allow_html=True)
 
-# Step 1: File Upload Section
+# Step 1: Modern File Upload Section
 if not st.session_state.processing_complete:
-    # Start upload section container
-    st.markdown("### 📁 Upload Your APN File")
-    st.markdown("Drag and drop your CSV or TXT file containing APNs, or click to browse")
+    st.markdown("""
+    <div class="upload-section">
+        <div class="upload-icon">📁</div>
+        <div class="upload-title">Upload Your APN File</div>
+        <div class="upload-subtitle">Drag and drop your CSV or TXT file containing APNs, or click to browse</div>
+    </div>
+    """, unsafe_allow_html=True)
     
     uploaded_file = st.file_uploader(
         "",
         type=['csv', 'txt'],
-        help="Supported formats: CSV with APN column or TXT with one APN per line",
+        help="Supported formats: CSV with APN column or TXT with one APN per line. Auto-detects XXX-XX-XXX-XXX format.",
         label_visibility="collapsed"
     )
     
@@ -800,14 +850,14 @@ if st.session_state.processing_complete and st.session_state.scraped_data is not
                 del st.session_state[key]
         st.rerun()
 
-# Footer
-st.markdown("---")
+# Modern footer
 st.markdown("""
-<div style='text-align: center; color: #6c757d; padding: 1rem;'>
-    <small>
-        🏠 <strong>Clark County APN Property Scraper</strong> • 
-        High-performance Nevada property data extraction • 
-        Built with Streamlit & Python
-    </small>
+<div class="modern-footer">
+    <strong>🏠 Clark County APN Property Scraper</strong><br>
+    <span class="performance-badge">0.5-1s per APN</span>
+    <span class="performance-badge">Smart Pattern Detection</span>
+    <span class="performance-badge">Real-time Progress</span>
 </div>
 """, unsafe_allow_html=True)
+
+st.markdown('</div>', unsafe_allow_html=True)  # Close main container
