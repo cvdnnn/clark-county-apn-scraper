@@ -665,7 +665,7 @@ st.markdown("""
 
 # Step 1: File Upload Section
 if not st.session_state.processing_complete:
-    st.markdown('<div class="upload-section">', unsafe_allow_html=True)
+    # Start upload section container
     st.markdown("### 📁 Upload Your APN File")
     st.markdown("Drag and drop your CSV or TXT file containing APNs, or click to browse")
     
@@ -706,12 +706,9 @@ if not st.session_state.processing_complete:
                     
         except Exception as e:
             st.error(f"❌ Error reading file: {str(e)}")
-            
-    st.markdown('</div>', unsafe_allow_html=True)
 
 # Step 2: Processing Section
 if 'apns' in st.session_state and st.session_state.apns and not st.session_state.processing_complete:
-    st.markdown('<div class="processing-card">', unsafe_allow_html=True)
     st.markdown("### ⚡ Processing Configuration")
     
     col1, col2 = st.columns([2, 1])
@@ -733,12 +730,9 @@ if 'apns' in st.session_state and st.session_state.apns and not st.session_state
     # Start processing button
     if st.button("🚀 Start Processing", type="primary", use_container_width=True):
         process_apns(st.session_state.apns, delay_setting)
-    
-    st.markdown('</div>', unsafe_allow_html=True)
 
 # Step 3: Results and Download Section
 if st.session_state.processing_complete and st.session_state.scraped_data is not None:
-    st.markdown('<div class="success-card">', unsafe_allow_html=True)
     st.markdown("### ✅ Processing Complete!")
     
     stats = st.session_state.processing_stats
@@ -747,29 +741,18 @@ if st.session_state.processing_complete and st.session_state.scraped_data is not
     col1, col2, col3, col4 = st.columns(4)
     
     with col1:
-        st.markdown('<div class="metric-card">', unsafe_allow_html=True)
         st.metric("Total Processed", stats['total'])
-        st.markdown('</div>', unsafe_allow_html=True)
     
     with col2:
-        st.markdown('<div class="metric-card">', unsafe_allow_html=True)
         st.metric("Successful", stats['successful'])
-        st.markdown('</div>', unsafe_allow_html=True)
     
     with col3:
-        st.markdown('<div class="metric-card">', unsafe_allow_html=True)
         st.metric("Success Rate", f"{stats['success_rate']:.1f}%")
-        st.markdown('</div>', unsafe_allow_html=True)
     
     with col4:
-        st.markdown('<div class="metric-card">', unsafe_allow_html=True)
         st.metric("Avg Speed", f"{stats['avg_speed']:.2f}s")
-        st.markdown('</div>', unsafe_allow_html=True)
-    
-    st.markdown('</div>', unsafe_allow_html=True)
     
     # Download section
-    st.markdown('<div class="download-section">', unsafe_allow_html=True)
     st.markdown("### 📥 Download Your Results")
     
     # Prepare CSV data
@@ -793,8 +776,6 @@ if st.session_state.processing_complete and st.session_state.scraped_data is not
         
         st.markdown(f"**File:** `{filename}`")
         st.markdown(f"**Size:** {len(csv_buffer.getvalue())} characters")
-    
-    st.markdown('</div>', unsafe_allow_html=True)
     
     # Data preview
     with st.expander("📊 Preview Results"):
