@@ -176,6 +176,137 @@ def authenticate_user() -> bool:
                 margin: 1rem 0;
                 color: #333333 !important;
             }
+            
+            /* User-friendly features showcase */
+            .features-showcase {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                gap: 1.5rem;
+                margin: 2rem 0;
+                padding: 2rem;
+                background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+                border-radius: 20px;
+                border: 1px solid #e9ecef;
+            }
+            
+            .feature-item {
+                display: flex;
+                align-items: center;
+                padding: 1.5rem;
+                background: white;
+                border-radius: 15px;
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+                transition: all 0.3s ease;
+                border: 1px solid #f0f0f0;
+            }
+            
+            .feature-item:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 8px 25px rgba(102, 126, 234, 0.15);
+                border-color: #667eea;
+            }
+            
+            .feature-icon {
+                font-size: 2.5rem;
+                margin-right: 1rem;
+                animation: pulse 2s infinite;
+            }
+            
+            .feature-content h4 {
+                color: #333;
+                margin: 0 0 0.5rem 0;
+                font-size: 1.1rem;
+                font-weight: 600;
+            }
+            
+            .feature-content p {
+                color: #6c757d;
+                margin: 0;
+                font-size: 0.9rem;
+                line-height: 1.4;
+            }
+            
+            /* Animated data flow */
+            .data-flow-animation {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                margin: 2rem 0;
+                padding: 2rem;
+                background: white;
+                border-radius: 20px;
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+                border: 1px solid #f0f0f0;
+            }
+            
+            .flow-step {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                padding: 1rem;
+                margin: 0 1rem;
+            }
+            
+            .flow-icon {
+                font-size: 2.5rem;
+                margin-bottom: 0.5rem;
+                padding: 1rem;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                border-radius: 50%;
+                color: white;
+                width: 60px;
+                height: 60px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                transition: all 0.3s ease;
+            }
+            
+            .flow-icon:hover {
+                transform: scale(1.1);
+                box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+            }
+            
+            .animated-processing {
+                animation: spin 2s linear infinite;
+            }
+            
+            .flow-label {
+                font-weight: 600;
+                color: #333;
+                font-size: 0.9rem;
+                text-align: center;
+            }
+            
+            .flow-arrow {
+                font-size: 1.5rem;
+                color: #667eea;
+                font-weight: bold;
+                animation: pulse 2s infinite;
+                margin: 0 0.5rem;
+            }
+            
+            /* Animations */
+            @keyframes pulse {
+                0% { opacity: 1; transform: scale(1); }
+                50% { opacity: 0.7; transform: scale(1.05); }
+                100% { opacity: 1; transform: scale(1); }
+            }
+            
+            @keyframes spin {
+                from { transform: rotate(0deg); }
+                to { transform: rotate(360deg); }
+            }
+            
+            @keyframes slideIn {
+                from { opacity: 0; transform: translateY(20px); }
+                to { opacity: 1; transform: translateY(0); }
+            }
+            
+            .features-showcase .feature-item:nth-child(1) { animation: slideIn 0.6s ease 0.1s both; }
+            .features-showcase .feature-item:nth-child(2) { animation: slideIn 0.6s ease 0.2s both; }
+            .features-showcase .feature-item:nth-child(3) { animation: slideIn 0.6s ease 0.3s both; }
+            .features-showcase .feature-item:nth-child(4) { animation: slideIn 0.6s ease 0.4s both; }
         </style>
         """, unsafe_allow_html=True)
         
@@ -188,16 +319,57 @@ def authenticate_user() -> bool:
         </div>
         """, unsafe_allow_html=True)
         
-        # Performance specifications display
+        # User-friendly animated features display
         st.markdown("""
-        <div class="performance-notice">
-            <strong>🚀 Performance Specifications:</strong><br>
-            • <strong>Target Speed:</strong> 0.5-1 second per APN<br>
-            • <strong>Connection Pooling:</strong> requests.Session() optimization<br>
-            • <strong>Parser:</strong> lxml for maximum speed<br>
-            • <strong>Error Handling:</strong> Comprehensive retry logic<br>
-            • <strong>Type Safety:</strong> Full type hints implementation<br>
-            • <strong>Security:</strong> Environment variable authentication
+        <div class="features-showcase">
+            <div class="feature-item">
+                <div class="feature-icon">⚡</div>
+                <div class="feature-content">
+                    <h4>Lightning Fast Processing</h4>
+                    <p>Get your property data in seconds, not hours</p>
+                </div>
+            </div>
+            
+            <div class="feature-item">
+                <div class="feature-icon">🎯</div>
+                <div class="feature-content">
+                    <h4>Smart Auto-Detection</h4>
+                    <p>Just upload your file - we'll find all the APNs automatically</p>
+                </div>
+            </div>
+            
+            <div class="feature-item">
+                <div class="feature-icon">📊</div>
+                <div class="feature-content">
+                    <h4>Real-Time Progress</h4>
+                    <p>Watch your data come to life with live updates</p>
+                </div>
+            </div>
+            
+            <div class="feature-item">
+                <div class="feature-icon">🔒</div>
+                <div class="feature-content">
+                    <h4>Secure & Reliable</h4>
+                    <p>Your data is protected with enterprise-grade security</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="data-flow-animation">
+            <div class="flow-step">
+                <div class="flow-icon">📁</div>
+                <div class="flow-label">Upload</div>
+            </div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-step">
+                <div class="flow-icon animated-processing">🔄</div>
+                <div class="flow-label">Process</div>
+            </div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-step">
+                <div class="flow-icon">📋</div>
+                <div class="flow-label">Results</div>
+            </div>
         </div>
         """, unsafe_allow_html=True)
         
