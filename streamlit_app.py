@@ -25,20 +25,24 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(level
 logger = logging.getLogger(__name__)
 
 # Security configuration using environment variables (secure for production)
-# Try multiple environment variable names for Railway compatibility
+# Try multiple environment variable names for Railway compatibility including service variables
 ADMIN_PASSWORD: str = (
     os.getenv("APP_PASSWORD") or 
     os.getenv("SCRAPER_PASSWORD") or 
     os.getenv("AUTH_PASSWORD") or 
     os.getenv("LOGIN_PASSWORD") or
+    os.getenv("RAILWAY_PRIVATE_PASSWORD") or  # Railway service variable
+    os.getenv("PRIVATE_PASSWORD") or  # Alternative Railway variable
     "CHANGE_ME_IN_PRODUCTION"
 )
 SESSION_TIMEOUT_MINUTES: int = int(os.getenv("SESSION_TIMEOUT", "480"))  # 8 hours default
 
-# Debug logging for environment variable detection with multiple fallbacks
+# Debug logging for environment variable detection with all fallbacks
 logger.info(f"Environment variable check: APP_PASSWORD={'SET' if os.getenv('APP_PASSWORD') else 'NOT_SET'}")
 logger.info(f"Environment variable check: SCRAPER_PASSWORD={'SET' if os.getenv('SCRAPER_PASSWORD') else 'NOT_SET'}")
 logger.info(f"Environment variable check: AUTH_PASSWORD={'SET' if os.getenv('AUTH_PASSWORD') else 'NOT_SET'}")
+logger.info(f"Environment variable check: RAILWAY_PRIVATE_PASSWORD={'SET' if os.getenv('RAILWAY_PRIVATE_PASSWORD') else 'NOT_SET'}")
+logger.info(f"Environment variable check: PRIVATE_PASSWORD={'SET' if os.getenv('PRIVATE_PASSWORD') else 'NOT_SET'}")
 logger.info(f"Final ADMIN_PASSWORD: {'CONFIGURED' if ADMIN_PASSWORD != 'CHANGE_ME_IN_PRODUCTION' else 'DEFAULT'}")
 
 def authenticate_user() -> bool:
@@ -58,56 +62,66 @@ def authenticate_user() -> bool:
             layout="centered"
         )
         
-        st.error("⚠️ **SECURITY WARNING**: Environment variable not configured")
+        st.error("⚠️ **SECURITY WARNING**: Railway environment variable sync issue detected")
         st.markdown("""
-        ### 🔧 Railway Environment Variable Issue Detected
+        ### 🔧 Railway Environment Variable Sync Problem
         
-        Railway is not loading the environment variables. Try these solutions:
+        Railway is not syncing your environment variables to the container. **Immediate solutions:**
         
-        **Option 1: Different Variable Name**
+        **Option 1: Use Railway Service Variables (Recommended)**
         1. **Railway Dashboard** → Your Project → **Variables**
-        2. **Delete existing** `SCRAPER_PASSWORD` variable (if any)
-        3. **Add NEW Variable**: 
-           - Name: `APP_PASSWORD`
-           - Value: `YourSecureCompanyPassword`
-        4. **Wait 2-3 minutes** for auto-redeploy
+        2. **Delete ALL existing** authentication variables
+        3. **Add NEW Service Variable**: 
+           - Name: `RAILWAY_PRIVATE_PASSWORD`
+           - Value: `ClarkCountyAPN_Internal2025!`
+        4. **Manually restart**: Dashboard → Deployments → Redeploy
         
-        **Option 2: Manual Railway Restart**
-        1. **Railway Dashboard** → Your Project → **Deployments**
-        2. **Click "Redeploy"** to force restart
-        3. **Wait for completion**
-        
-        **Option 3: Railway CLI Method**
+        **Option 2: Railway CLI Force Sync**
         ```bash
+        # If you have Railway CLI installed
         railway login
-        railway variables set APP_PASSWORD=YourPassword
-        railway redeploy
+        railway variables set RAILWAY_PRIVATE_PASSWORD=ClarkCountyAPN_Internal2025!
+        railway redeploy --service web
         ```
         
-        **Current Status**: Railway environment variable loading issue detected
+        **Option 3: Temporary Workaround**
+        We can temporarily hardcode a secure password in the private repository
+        (not recommended for production, but works while debugging Railway)
         
-        **Debug Info**: Environment variables not being loaded by Railway container
+        **Technical Issue**: Railway container not loading custom environment variables
+        despite them being visible in dashboard. This is a known Railway sync issue.
         """)
         
-        # Enhanced debug information with Railway-specific guidance
-        with st.expander("🔍 Railway Debug Information"):
-            st.write("**Railway Environment Variables Detected:**")
+        # Enhanced debug information with Railway-specific troubleshooting
+        with st.expander("🔍 Railway Technical Debug Information"):
+            st.write("**Railway System Variables (Working):**")
             env_vars = dict(os.environ)
             railway_vars = {k: v for k, v in env_vars.items() if k.startswith('RAILWAY_')}
             st.json(railway_vars)
             
-            st.write("**Authentication Variables Checked:**")
+            st.write("**Custom Authentication Variables (FAILING):**")
             auth_check = {
                 'APP_PASSWORD': 'SET' if os.getenv('APP_PASSWORD') else 'NOT_SET',
                 'SCRAPER_PASSWORD': 'SET' if os.getenv('SCRAPER_PASSWORD') else 'NOT_SET', 
                 'AUTH_PASSWORD': 'SET' if os.getenv('AUTH_PASSWORD') else 'NOT_SET',
-                'LOGIN_PASSWORD': 'SET' if os.getenv('LOGIN_PASSWORD') else 'NOT_SET'
+                'LOGIN_PASSWORD': 'SET' if os.getenv('LOGIN_PASSWORD') else 'NOT_SET',
+                'RAILWAY_PRIVATE_PASSWORD': 'SET' if os.getenv('RAILWAY_PRIVATE_PASSWORD') else 'NOT_SET',
+                'PRIVATE_PASSWORD': 'SET' if os.getenv('PRIVATE_PASSWORD') else 'NOT_SET'
             }
             st.json(auth_check)
+            
+            st.write("**Railway Project Info:**")
+            project_info = {
+                'PROJECT_ID': os.getenv('RAILWAY_PROJECT_ID'),
+                'SERVICE_ID': os.getenv('RAILWAY_SERVICE_ID'), 
+                'ENVIRONMENT': os.getenv('RAILWAY_ENVIRONMENT'),
+                'DEPLOYMENT_ID': os.getenv('RAILWAY_DEPLOYMENT_ID')
+            }
+            st.json(project_info)
         
-        logger.critical("Railway environment variable loading issue - no authentication variables detected")
+        logger.critical("Railway environment variable sync issue - custom variables not loaded despite dashboard configuration")
         st.stop()
-    
+
     # Initialize session state for authentication with proper typing
     if "authenticated" not in st.session_state:
         st.session_state.authenticated = False
