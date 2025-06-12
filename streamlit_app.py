@@ -204,34 +204,45 @@ def authenticate_user() -> bool:
         # High-performance authentication form
         col1, col2, col3 = st.columns([1, 2, 1])
         with col2:
-            st.markdown('<div class="auth-form">', unsafe_allow_html=True)
-            
-            password_input: str = st.text_input(
-                "🔑 Enter Access Password:",
-                type="password",
-                help="Contact IT department for access credentials",
-                placeholder="Enter secure company password"
-            )
-            
-            if st.button("🚪 Login", use_container_width=True, type="primary"):
-                # Performance-optimized password verification
-                if password_input == ADMIN_PASSWORD:
-                    st.session_state.authenticated = True
-                    st.session_state.auth_timestamp = time.time()
-                    
-                    # Log successful authentication (no sensitive data)
-                    logger.info(f"Successful authentication from session {id(st.session_state)}")
-                    
-                    st.success("✅ Access granted! Loading high-performance scraper interface...")
-                    time.sleep(1.5)
-                    st.rerun()
-                else:
-                    st.error("❌ Invalid password. Contact IT department for access.")
-                    
-                    # Log failed authentication attempt (no sensitive data)
-                    logger.warning(f"Failed authentication attempt from session {id(st.session_state)}")
-            
-            st.markdown('</div>', unsafe_allow_html=True)
+            # Create styled container for form
+            with st.container():
+                st.markdown("""
+                <div style="
+                    background: white;
+                    padding: 2rem;
+                    border-radius: 10px;
+                    margin: 1rem 0;
+                    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+                ">
+                """, unsafe_allow_html=True)
+                
+                password_input: str = st.text_input(
+                    "🔑 Enter Access Password:",
+                    type="password",
+                    help="Contact IT department for access credentials",
+                    placeholder="Enter secure company password",
+                    key="auth_password"
+                )
+                
+                if st.button("🚪 Login", use_container_width=True, type="primary", key="auth_login"):
+                    # Performance-optimized password verification
+                    if password_input == ADMIN_PASSWORD:
+                        st.session_state.authenticated = True
+                        st.session_state.auth_timestamp = time.time()
+                        
+                        # Log successful authentication (no sensitive data)
+                        logger.info(f"Successful authentication from session {id(st.session_state)}")
+                        
+                        st.success("✅ Access granted! Loading high-performance scraper interface...")
+                        time.sleep(1.5)
+                        st.rerun()
+                    else:
+                        st.error("❌ Invalid password. Contact IT department for access.")
+                        
+                        # Log failed authentication attempt (no sensitive data)
+                        logger.warning(f"Failed authentication attempt from session {id(st.session_state)}")
+                
+                st.markdown("</div>", unsafe_allow_html=True)
         
         # Footer information
         st.markdown("---")
