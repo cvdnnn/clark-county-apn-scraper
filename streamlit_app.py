@@ -28,6 +28,10 @@ logger = logging.getLogger(__name__)
 ADMIN_PASSWORD: str = os.getenv("SCRAPER_PASSWORD", "CHANGE_ME_IN_PRODUCTION")
 SESSION_TIMEOUT_MINUTES: int = int(os.getenv("SESSION_TIMEOUT", "480"))  # 8 hours default
 
+# Debug logging for environment variable detection
+logger.info(f"Environment variable check: SCRAPER_PASSWORD={'SET' if ADMIN_PASSWORD != 'CHANGE_ME_IN_PRODUCTION' else 'NOT_SET'}")
+logger.info(f"Current ADMIN_PASSWORD value: {ADMIN_PASSWORD[:3]}*** (first 3 chars)")
+
 def authenticate_user() -> bool:
     """
     High-performance authentication system using secure environment variables.
@@ -37,10 +41,41 @@ def authenticate_user() -> bool:
     Returns:
         bool: True if user is authenticated and session valid, False otherwise
     """
-    # Security check: Warn if using default password (development mode)
+    # Enhanced security check with better error messaging
     if ADMIN_PASSWORD == "CHANGE_ME_IN_PRODUCTION":
-        st.error("⚠️ SECURITY WARNING: Default password detected. Configure SCRAPER_PASSWORD environment variable.")
-        logger.critical("Application started with default password - security risk detected")
+        st.set_page_config(
+            page_title="Clark County Scraper - Configuration Error",
+            page_icon="⚠️",
+            layout="centered"
+        )
+        
+        st.error("⚠️ **SECURITY WARNING**: Environment variable not configured")
+        st.markdown("""
+        ### 🔧 Configuration Required
+        
+        The `SCRAPER_PASSWORD` environment variable must be set in Railway:
+        
+        **Steps to fix:**
+        1. **Railway Dashboard** → Your Project → **Variables**
+        2. **Add Variable**: 
+           - Name: `SCRAPER_PASSWORD`
+           - Value: `YourSecureCompanyPassword`
+        3. **Redeploy** the application (Railway should auto-redeploy)
+        4. **Wait 2-3 minutes** for deployment to complete
+        
+        **Current Status**: Using default development password (security risk)
+        
+        **Debug Info**: Environment variable `SCRAPER_PASSWORD` not detected
+        """)
+        
+        # Add debug information
+        with st.expander("🔍 Debug Information"):
+            st.write("**Environment Variables Detected:**")
+            env_vars = dict(os.environ)
+            filtered_vars = {k: v for k, v in env_vars.items() if not k.startswith(('SECRET', 'PASSWORD', 'KEY', 'TOKEN'))}
+            st.json(filtered_vars)
+        
+        logger.critical("Application started with default password - SCRAPER_PASSWORD environment variable not found")
         st.stop()
     
     # Initialize session state for authentication with proper typing
