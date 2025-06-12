@@ -14,6 +14,14 @@ import os
 from typing import List, Optional
 from datetime import datetime
 
+# Configure page FIRST - before any other Streamlit commands
+st.set_page_config(
+    page_title="Clark County APN Scraper",
+    page_icon="🏠",
+    layout="wide",
+    initial_sidebar_state="collapsed"
+)
+
 # Import existing scraper components
 from src.scraper.web_scraper import ClarkCountyScraper
 from src.scraper.data_parser import PropertyDataParser
@@ -56,12 +64,6 @@ def authenticate_user() -> bool:
     """
     # Enhanced security check with better error messaging
     if ADMIN_PASSWORD == "CHANGE_ME_IN_PRODUCTION":
-        st.set_page_config(
-            page_title="Clark County Scraper - Configuration Error",
-            page_icon="⚠️",
-            layout="centered"
-        )
-        
         st.error("⚠️ **SECURITY WARNING**: Railway environment variable sync issue detected")
         st.markdown("""
         ### 🔧 Railway Environment Variable Sync Problem
@@ -137,12 +139,6 @@ def authenticate_user() -> bool:
     
     # Show authentication form if not authenticated
     if not st.session_state.authenticated:
-        st.set_page_config(
-            page_title="Clark County Scraper - Access Control",
-            page_icon="🔒",
-            layout="centered"
-        )
-        
         # High-performance CSS injection
         st.markdown("""
         <style>
@@ -427,14 +423,6 @@ def extract_apns_from_content(content: str, filename: str) -> List[str]:
     
     logger.info(f"Extracted {len(apns)} unique APNs using pattern matching")
     return apns
-
-# Page configuration
-st.set_page_config(
-    page_title="Clark County APN Scraper",
-    page_icon="🏠",
-    layout="wide",
-    initial_sidebar_state="collapsed"
-)
 
 # Custom CSS for modern styling
 st.markdown("""
