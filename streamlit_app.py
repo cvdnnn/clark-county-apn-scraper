@@ -25,12 +25,21 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(level
 logger = logging.getLogger(__name__)
 
 # Security configuration using environment variables (secure for production)
-ADMIN_PASSWORD: str = os.getenv("SCRAPER_PASSWORD", "CHANGE_ME_IN_PRODUCTION")
+# Try multiple environment variable names for Railway compatibility
+ADMIN_PASSWORD: str = (
+    os.getenv("APP_PASSWORD") or 
+    os.getenv("SCRAPER_PASSWORD") or 
+    os.getenv("AUTH_PASSWORD") or 
+    os.getenv("LOGIN_PASSWORD") or
+    "CHANGE_ME_IN_PRODUCTION"
+)
 SESSION_TIMEOUT_MINUTES: int = int(os.getenv("SESSION_TIMEOUT", "480"))  # 8 hours default
 
-# Debug logging for environment variable detection
-logger.info(f"Environment variable check: SCRAPER_PASSWORD={'SET' if ADMIN_PASSWORD != 'CHANGE_ME_IN_PRODUCTION' else 'NOT_SET'}")
-logger.info(f"Current ADMIN_PASSWORD value: {ADMIN_PASSWORD[:3]}*** (first 3 chars)")
+# Debug logging for environment variable detection with multiple fallbacks
+logger.info(f"Environment variable check: APP_PASSWORD={'SET' if os.getenv('APP_PASSWORD') else 'NOT_SET'}")
+logger.info(f"Environment variable check: SCRAPER_PASSWORD={'SET' if os.getenv('SCRAPER_PASSWORD') else 'NOT_SET'}")
+logger.info(f"Environment variable check: AUTH_PASSWORD={'SET' if os.getenv('AUTH_PASSWORD') else 'NOT_SET'}")
+logger.info(f"Final ADMIN_PASSWORD: {'CONFIGURED' if ADMIN_PASSWORD != 'CHANGE_ME_IN_PRODUCTION' else 'DEFAULT'}")
 
 def authenticate_user() -> bool:
     """
@@ -51,31 +60,52 @@ def authenticate_user() -> bool:
         
         st.error("⚠️ **SECURITY WARNING**: Environment variable not configured")
         st.markdown("""
-        ### 🔧 Configuration Required
+        ### 🔧 Railway Environment Variable Issue Detected
         
-        The `SCRAPER_PASSWORD` environment variable must be set in Railway:
+        Railway is not loading the environment variables. Try these solutions:
         
-        **Steps to fix:**
+        **Option 1: Different Variable Name**
         1. **Railway Dashboard** → Your Project → **Variables**
-        2. **Add Variable**: 
-           - Name: `SCRAPER_PASSWORD`
+        2. **Delete existing** `SCRAPER_PASSWORD` variable (if any)
+        3. **Add NEW Variable**: 
+           - Name: `APP_PASSWORD`
            - Value: `YourSecureCompanyPassword`
-        3. **Redeploy** the application (Railway should auto-redeploy)
-        4. **Wait 2-3 minutes** for deployment to complete
+        4. **Wait 2-3 minutes** for auto-redeploy
         
-        **Current Status**: Using default development password (security risk)
+        **Option 2: Manual Railway Restart**
+        1. **Railway Dashboard** → Your Project → **Deployments**
+        2. **Click "Redeploy"** to force restart
+        3. **Wait for completion**
         
-        **Debug Info**: Environment variable `SCRAPER_PASSWORD` not detected
+        **Option 3: Railway CLI Method**
+        ```bash
+        railway login
+        railway variables set APP_PASSWORD=YourPassword
+        railway redeploy
+        ```
+        
+        **Current Status**: Railway environment variable loading issue detected
+        
+        **Debug Info**: Environment variables not being loaded by Railway container
         """)
         
-        # Add debug information
-        with st.expander("🔍 Debug Information"):
-            st.write("**Environment Variables Detected:**")
+        # Enhanced debug information with Railway-specific guidance
+        with st.expander("🔍 Railway Debug Information"):
+            st.write("**Railway Environment Variables Detected:**")
             env_vars = dict(os.environ)
-            filtered_vars = {k: v for k, v in env_vars.items() if not k.startswith(('SECRET', 'PASSWORD', 'KEY', 'TOKEN'))}
-            st.json(filtered_vars)
+            railway_vars = {k: v for k, v in env_vars.items() if k.startswith('RAILWAY_')}
+            st.json(railway_vars)
+            
+            st.write("**Authentication Variables Checked:**")
+            auth_check = {
+                'APP_PASSWORD': 'SET' if os.getenv('APP_PASSWORD') else 'NOT_SET',
+                'SCRAPER_PASSWORD': 'SET' if os.getenv('SCRAPER_PASSWORD') else 'NOT_SET', 
+                'AUTH_PASSWORD': 'SET' if os.getenv('AUTH_PASSWORD') else 'NOT_SET',
+                'LOGIN_PASSWORD': 'SET' if os.getenv('LOGIN_PASSWORD') else 'NOT_SET'
+            }
+            st.json(auth_check)
         
-        logger.critical("Application started with default password - SCRAPER_PASSWORD environment variable not found")
+        logger.critical("Railway environment variable loading issue - no authentication variables detected")
         st.stop()
     
     # Initialize session state for authentication with proper typing
