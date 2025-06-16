@@ -986,7 +986,7 @@ if st.session_state.processing_complete and st.session_state.scraped_data is not
 # Modern footer
 st.markdown("""
 <div class="modern-footer">
-    <strong>🏠 Clark County APN Property Scraper</strong><br>
+    <strong>Clark County APN Property Scraper</strong><br>
     <span class="performance-badge">0.5-1s per APN</span>
     <span class="performance-badge">Smart Pattern Detection</span>
     <span class="performance-badge">Real-time Progress</span>
